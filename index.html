@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>QQ飞车 3D · 海滨小镇（网页同人还原版）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;color:#fff;user-select:none;-webkit-user-select:none}
+#c,#fx{position:fixed;inset:0;display:block}
+#fx{pointer-events:none}
+#hud{position:fixed;inset:0;pointer-events:none;display:none}
+.glass{background:linear-gradient(135deg,rgba(10,30,80,.62),rgba(0,10,40,.38));border:1px solid rgba(120,200,255,.45);border-radius:12px;box-shadow:0 0 18px rgba(0,150,255,.25) inset}
+#tl{position:absolute;left:18px;top:16px;padding:10px 18px;min-width:210px}
+#rank{font-size:58px;font-weight:900;font-style:italic;line-height:1;color:#ffd23f;text-shadow:0 0 12px rgba(255,160,0,.7),0 3px 0 #a50}
+#rank small{font-size:24px;color:#fff}
+#lap{font-size:20px;font-weight:700;margin-top:4px}
+#time{font-size:18px;font-variant-numeric:tabular-nums;margin-top:2px}
+#lapTimes{font-size:13px;opacity:.85;margin-top:4px;line-height:1.5;font-variant-numeric:tabular-nums}
+#mm{position:absolute;right:16px;top:16px;width:220px;height:220px;padding:6px}
+#mini{width:100%;height:100%}
+#speedo{position:absolute;right:8px;bottom:8px;width:260px;height:260px}
+#nbox{position:absolute;left:18px;bottom:18px;padding:12px 16px;width:310px}
+.slots{display:flex;gap:10px;align-items:center}
+.slot{width:62px;height:62px;border-radius:10px;border:2px solid rgba(120,200,255,.5);display:flex;align-items:center;justify-content:center;font-weight:900;font-style:italic;color:rgba(255,255,255,.25);background:rgba(0,0,0,.3);transition:.15s}
+.slot.on{color:#fff;background:radial-gradient(circle,#4cf 0,#06c 70%);border-color:#bff;box-shadow:0 0 16px #0cf;text-shadow:0 0 6px #fff}
+.bar{height:14px;border-radius:7px;background:rgba(0,0,0,.45);margin-top:10px;overflow:hidden;border:1px solid rgba(120,200,255,.4)}
+#nfill{height:100%;width:0;background:linear-gradient(90deg,#08f,#0ff,#fff);box-shadow:0 0 10px #0ff}
+.lbl{font-size:13px;margin-top:5px;opacity:.9}
+#msg{position:absolute;left:0;right:0;top:24%;text-align:center;font-size:84px;font-weight:900;font-style:italic;opacity:0;transition:opacity .25s,transform .12s;text-shadow:0 0 18px rgba(0,0,0,.6),0 4px 0 rgba(0,0,0,.5)}
+#combo{position:absolute;left:0;right:0;top:62%;text-align:center;font-size:44px;font-weight:900;font-style:italic;color:#ffd84a;opacity:0;transition:opacity .2s;text-shadow:0 0 14px #f80,0 3px 0 #a40}
+#warn{position:absolute;left:50%;top:14%;transform:translateX(-50%);font-size:30px;font-weight:900;color:#ff4040;background:rgba(0,0,0,.5);padding:8px 26px;border-radius:10px;display:none;animation:bl .5s infinite alternate}
+@keyframes bl{to{opacity:.35}}
+#keys{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);padding:6px 14px;font-size:13px;opacity:.85;white-space:nowrap}
+.ov{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,rgba(0,20,60,.35),rgba(0,0,20,.8));z-index:10}
+.card{padding:26px 34px;max-width:860px;width:92vw;max-height:94vh;overflow:auto}
+.logo{font-size:76px;font-weight:900;font-style:italic;text-align:center;letter-spacing:4px;background:linear-gradient(180deg,#fff 0,#ffe066 45%,#ff8a00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 4px 0 #a33) drop-shadow(0 0 18px rgba(255,140,0,.6))}
+.sub{text-align:center;opacity:.85;margin:4px 0 16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 26px;font-size:14px;margin-bottom:14px}
+kbd{display:inline-block;min-width:26px;padding:2px 7px;margin:0 2px;border-radius:5px;background:linear-gradient(#fff,#cfd8e6);color:#123;font:700 12px/18px sans-serif;text-align:center;box-shadow:0 2px 0 #678}
+.tips{font-size:13px;line-height:1.75;opacity:.92;background:rgba(0,0,0,.25);border-radius:8px;padding:10px 14px}
+.tips b{color:#ffd84a}
+.cars{display:flex;gap:10px;justify-content:center;margin:16px 0 6px;flex-wrap:wrap}
+.car{cursor:pointer;padding:8px 14px;border-radius:10px;border:2px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);text-align:center;font-size:14px;transition:.15s}
+.car i{display:block;width:54px;height:22px;border-radius:8px 14px 4px 4px;margin:0 auto 6px}
+.car small{display:block;opacity:.7;font-size:11px;margin-top:2px}
+.car.sel{border-color:#ffd84a;box-shadow:0 0 14px #fa0;background:rgba(255,200,0,.15)}
+.go{display:block;margin:14px auto 0;padding:12px 60px;font-size:24px;font-weight:900;font-style:italic;color:#fff;border:0;border-radius:40px;cursor:pointer;background:linear-gradient(180deg,#ffb000,#ff5a00);box-shadow:0 5px 0 #a33,0 0 24px rgba(255,120,0,.6)}
+.go:hover{filter:brightness(1.15)}
+.go:active{transform:translateY(3px);box-shadow:0 2px 0 #a33}
+#rtab{width:100%;border-collapse:collapse;margin:16px 0;font-size:18px}
+#rtab td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.15);text-align:center}
+#rtab tr:first-child td{opacity:.6;font-size:14px}
+#rtab tr.me td{color:#ffd84a;font-weight:900}
+#pause .logo{font-size:48px}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#02081a;font-size:26px;z-index:20}
+#touch{display:none}
+@media (pointer:coarse){#touch{display:block}#keys{display:none}}
+.tb{position:fixed;z-index:5;border-radius:50%;background:rgba(0,40,100,.45);border:2px solid rgba(140,210,255,.6);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px;touch-action:none}
+.tb.on{background:rgba(0,160,255,.6)}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<canvas id="fx"></canvas>
+<div id="hud">
+  <div id="tl" class="glass">
+    <div id="rank">1<small>/4</small></div>
+    <div id="lap">圈数 <span id="lapN">1</span>/3</div>
+    <div id="time">00:00.00</div>
+    <div id="lapTimes"></div>
+  </div>
+  <div id="mm" class="glass"><canvas id="mini" width="440" height="440"></canvas></div>
+  <canvas id="speedo" width="520" height="520"></canvas>
+  <div id="nbox" class="glass">
+    <div class="slots"><div class="slot" id="s0">N₂O</div><div class="slot" id="s1">N₂O</div><div style="font-size:13px;opacity:.85;line-height:1.5">Ctrl / 空格<br>释放氮气</div></div>
+    <div class="bar"><div id="nfill"></div></div>
+    <div class="lbl">漂移集气 <span id="npct">0%</span></div>
+  </div>
+  <div id="msg"></div>
+  <div id="combo"></div>
+  <div id="warn">⚠ 逆向行驶 · 按 R 复位</div>
+  <div id="keys" class="glass">↑↓←→/WASD 驾驶 · Shift 漂移 · 出弯松开再点↑ 小喷/双喷 · Ctrl/空格 氮气 · R 复位 · C 视角 · M 音乐 · P 暂停 · H 隐藏提示</div>
+</div>
+<div id="touch">
+  <div class="tb" data-k="ArrowLeft" style="left:20px;bottom:40px;width:90px;height:90px">◀</div>
+  <div class="tb" data-k="ArrowRight" style="left:125px;bottom:40px;width:90px;height:90px">▶</div>
+  <div class="tb" data-k="ArrowDown" style="right:290px;bottom:30px;width:64px;height:64px;font-size:14px">刹车</div>
+  <div class="tb" data-k="ShiftLeft" style="right:170px;bottom:30px;width:100px;height:100px">漂移</div>
+  <div class="tb" data-k="ArrowUp" style="right:180px;bottom:150px;width:80px;height:80px;font-size:15px">油门<br>小喷</div>
+  <div class="tb" data-k="Space" style="right:40px;bottom:280px;width:84px;height:84px;font-size:15px">氮气</div>
+  <div class="tb" data-k="KeyR" style="left:20px;top:200px;width:56px;height:56px;font-size:13px">复位</div>
+</div>
+<div id="menu" class="ov">
+  <div class="card glass">
+    <div class="logo">QQ飞车</div>
+    <div class="sub">3D 网页同人版 · 经典赛道「海滨小镇」 · 4 人 3 圈个人竞速</div>
+    <div class="grid">
+      <div><kbd>↑</kbd><kbd>W</kbd> 油门（按住）</div>
+      <div><kbd>↓</kbd><kbd>S</kbd> 刹车 / 倒车</div>
+      <div><kbd>←</kbd><kbd>→</kbd> <kbd>A</kbd><kbd>D</kbd> 转向</div>
+      <div><kbd>Shift</kbd> + 方向 漂移（集气）</div>
+      <div><kbd>Ctrl</kbd> / <kbd>空格</kbd> 释放氮气 N₂O</div>
+      <div><kbd>R</kbd> 复位到赛道</div>
+      <div><kbd>C</kbd> 切换视角（标准/远景/车头）</div>
+      <div><kbd>M</kbd> 音乐 <kbd>P</kbd>/<kbd>Esc</kbd> 暂停 <kbd>H</kbd> 提示</div>
+    </div>
+    <div class="tips">
+      <b>漂移：</b>时速 50+ 过弯时按住方向键再按 <kbd>Shift</kbd>，车尾甩出侧滑。漂移中方向键按同侧收紧、松开放宽；反打方向立即回正。侧滑角越大、速度越快，集气越快。<br>
+      <b>小喷：</b>漂移结束（松开 Shift 与方向键或反打）的瞬间，松开 <kbd>↑</kbd> 再点一下，获得短暂加速。<br>
+      <b>双喷：</b>小喷后 0.15~0.7 秒内再点一次 <kbd>↑</kbd>，追加更强的第二段喷射，并额外集气。<br>
+      <b>氮气：</b>集气条满得到一个氮气（最多 2 个），按 <kbd>Ctrl</kbd>/<kbd>空格</kbd> 释放 3 秒大幅提速。赛道上的蓝色氮气箱也能直接拾取。<br>
+      <b>起步喷：</b>倒计时最后约 0.35 秒（「1」快结束时）按下 <kbd>↑</kbd> 并按住，GO 时获得完美起步。<br>
+      <b>加速带：</b>压过赛道上的黄色箭头获得加速。用 WASD 时建议空格放氮气（Ctrl+W 会关闭标签页）。
+    </div>
+    <div class="cars">
+      <div class="car sel" data-i="0"><i style="background:#e8262b"></i>雷诺<small>均衡型</small></div>
+      <div class="car" data-i="1"><i style="background:#1a6dff"></i>天行者<small>集气 +15%</small></div>
+      <div class="car" data-i="2"><i style="background:#f5f5f5"></i>圣光<small>极速 +4% · 加速略慢</small></div>
+    </div>
+    <button class="go" id="start">开始比赛</button>
+  </div>
+</div>
+<div id="result" class="ov" style="display:none">
+  <div class="card glass">
+    <div class="logo" style="font-size:52px">比赛结束</div>
+    <table id="rtab"></table>
+    <button class="go" id="again">再来一局</button>
+  </div>
+</div>
+<div id="pause" class="ov" style="display:none"><div class="logo">暂停中 · 按 P 继续</div></div>
+<div id="loading">赛道加载中…</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module" src="game.js"></script>
+<script>
+// 触屏按键 → 合成键盘事件（game.js 按 e.code 读取）
+document.querySelectorAll('.tb').forEach(b => {
+  const code = b.dataset.k, fire = t => dispatchEvent(new KeyboardEvent(t, { code }));
+  b.addEventListener('pointerdown', e => { e.preventDefault(); b.setPointerCapture(e.pointerId); b.classList.add('on'); fire('keydown'); });
+  const up = () => { if (b.classList.contains('on')) { b.classList.remove('on'); fire('keyup'); } };
+  b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up);
+});
+addEventListener('error', e => { const l = document.getElementById('loading'); if (l && l.style.display !== 'none') l.textContent = '加载失败：' + e.message; });
+</script>
+</body>
+</html>
